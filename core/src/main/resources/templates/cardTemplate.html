@@ -53,7 +53,10 @@
 
         .box {
             /* background-color: #f2f2f2; */
-            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+        .box-border {
             padding: 5px;
         }
 
@@ -106,7 +109,7 @@
                 <section class="sheet padding-xmm">
                     <div class="container-self">
             </#if>
-                    <div class="box card rounded-0">
+                    <div class="box box-border card rounded-0">
                         <#if cardPlayer.partitionId gt 0>
                         <div class="card-body" style="padding: 2px">
                             <h5 class="card-title">
@@ -126,7 +129,7 @@
                                             </script>
                                         </div>
                                         <div class="col-9">
-                                            <div class="pt-2" style="font-size: 30px">BK JEUGD 2024</div>
+                                            <div class="pt-5" style="font-size: 30px">BK JEUGD 2024</div>
 
                                         </div>
                                     </div>
