@@ -25,7 +25,8 @@ public class TpRepositoryCardImplTest {
     @BeforeAll
     public static void init() throws URISyntaxException {
         // https://www.toernooi.nl/tournament/2492F915-3372-422B-BE35-579E1AF9B639
-        final Path path = Paths.get(TpRepositoryImpl.class.getResource("/tpFiles/PBOJeugdcupBCDePluimplukkers2024Voor.tp").toURI());
+        ///tpFiles/PBOJeugdcupBCDePluimplukkers2024Voor.tp
+        final Path path = Paths.get(TpRepositoryImpl.class.getResource("/tpFiles/2024.11.07_bk_jeugd.tp").toURI());
         tpRepository = new TpRepositoryCardImpl(path);
     }
 

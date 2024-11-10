@@ -12,9 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventNameWithDate {
+    private static Date plannedDateCutOff = new Date(2024 - 1900,10,1);
     private String eventName;
     private Date date;
     private Match match;
+
+    public boolean isPlanned() {
+        return date != null && getDate().after(plannedDateCutOff);
+    }
 
     public String teamVsTeamVisual() {
         return match.getTeam1().toStringVisual() + " vs " + match.getTeam2().toStringVisual();
@@ -23,17 +28,21 @@ public class EventNameWithDate {
     public List<Player> oppositeTeamPlayers(String memberId) {
         List<Player> result = new ArrayList<>();
         if (
-                (match.getTeam1().getPlayer1() != null && match.getTeam1().getPlayer1().getMemberId().equals(memberId))
-                        || (match.getTeam1().getPlayer2() != null && match.getTeam1().getPlayer2().getMemberId().equals(memberId))
+                (match.getTeam1() != null && match.getTeam1().getPlayer1() != null && match.getTeam1().getPlayer1().getMemberId().equals(memberId))
+                        || (match.getTeam1() != null && match.getTeam1().getPlayer2() != null && match.getTeam1().getPlayer2().getMemberId().equals(memberId))
         ) {
-            addIfNotNull(result, match.getTeam2().getPlayer1());
-            addIfNotNull(result, match.getTeam2().getPlayer2());
+            if (match.getTeam2() != null ) {
+                addIfNotNull(result, match.getTeam2().getPlayer1());
+                addIfNotNull(result, match.getTeam2().getPlayer2());
+            }
         } else if ((
-                (match.getTeam2().getPlayer1() != null && match.getTeam2().getPlayer1().getMemberId().equals(memberId))
-                        || (match.getTeam2().getPlayer2() != null && match.getTeam2().getPlayer2().getMemberId().equals(memberId))
+                (match.getTeam2() != null && match.getTeam2().getPlayer1() != null && match.getTeam2().getPlayer1().getMemberId().equals(memberId))
+                        || (match.getTeam2() != null && match.getTeam2().getPlayer2() != null && match.getTeam2().getPlayer2().getMemberId().equals(memberId))
         )) {
-            addIfNotNull(result, match.getTeam1().getPlayer1());
-            addIfNotNull(result, match.getTeam1().getPlayer2());
+            if (match.getTeam1() != null) {
+                addIfNotNull(result, match.getTeam1().getPlayer1());
+                addIfNotNull(result, match.getTeam1().getPlayer2());
+            }
         }
         return result;
     }

@@ -39,6 +39,7 @@ public class TpRepositoryCardImpl extends TpRepositoryImpl {
                 + "INNER JOIN PlayerMatch AS hometeam ON thematch.van1 = hometeam.planning "
                 + "INNER JOIN PlayerMatch AS awayteam ON thematch.van2 = awayteam.planning "
                 + "AND thematch.draw = hometeam.draw AND thematch.draw = awayteam.draw " + "AND reversehomeaway=FALSE "
+                + "AND thematch.winner < 1 " //Bye's have already a winner. Not interested in these matches.
                 + "ORDER BY thematch.plandate;";
 
         try (final ResultSet rs = executeSql(query)) {
@@ -58,9 +59,12 @@ public class TpRepositoryCardImpl extends TpRepositoryImpl {
                         .isLostByGivingUp(rs.getInt("scorestatus") == 2)
                         .planDate(new java.util.Date(rs.getTimestamp("plandate").getTime()))
                         .build();
-                if (match.getTeam1() != null && match.getTeam2()!= null) {
+                if (!(match.getTeam1() == null && match.getTeam2()== null)) {
                     result.add(match);
                 }
+                //else {
+                //    System.out.println("Match without teams: " + match);
+                //}
             }
         } catch (final SQLException e) {
             throw new RuntimeException("Unable to get matches", e);
@@ -74,25 +78,33 @@ public class TpRepositoryCardImpl extends TpRepositoryImpl {
 
        matches.forEach(match -> {
 
-           if (match.getTeam1()!= null) {
-               Stream.of(match.getTeam1().getPlayer1(), match.getTeam1().getPlayer2(), match.getTeam2().getPlayer1(), match.getTeam2().getPlayer2())
-                       .filter(Objects::nonNull)
-                       .forEach(player -> {
-                            result.computeIfAbsent(player, k -> new ArrayList<>());
-                            result.computeIfPresent(player, (k, v) ->  {
-                                EventNameWithDate eventNameWithDate = new EventNameWithDate(match.getDraw().getEvent().getName(), match.getPlanDate(), match);
-
-                                Optional<EventNameWithDate> existingEventWithSameName = v.stream().filter(x -> x.getEventName().equals(eventNameWithDate.getEventName())).findFirst();
-                                if (!existingEventWithSameName.isPresent()) {
-                                    v.add(eventNameWithDate);
-                                } else if (eventNameWithDate.getDate().before(existingEventWithSameName.get().getDate())) {
-                                    existingEventWithSameName.get().setDate(eventNameWithDate.getDate());
-                                }
-                                return v;
-                            });
-                       });
-
+           List<Player> players = new ArrayList<>();
+           if (match.getTeam1() != null) {
+               players.add(match.getTeam1().getPlayer1());
+               players.add(match.getTeam1().getPlayer2());
            }
+           if (match.getTeam2() != null) {
+               players.add(match.getTeam2().getPlayer1());
+               players.add(match.getTeam2().getPlayer2());
+           }
+
+           players.stream()
+                   .filter(Objects::nonNull)
+                   .forEach(player -> {
+                        result.computeIfAbsent(player, k -> new ArrayList<>());
+                        result.computeIfPresent(player, (k, v) ->  {
+                            EventNameWithDate eventNameWithDate = new EventNameWithDate(match.getDraw().getEvent().getName(), match.getPlanDate(), match);
+
+                            Optional<EventNameWithDate> existingEventWithSameName = v.stream().filter(x -> x.getEventName().equals(eventNameWithDate.getEventName())).findFirst();
+                            if (!existingEventWithSameName.isPresent()) {
+                                v.add(eventNameWithDate);
+                            } else if ((eventNameWithDate.isPlanned() && !existingEventWithSameName.get().isPlanned()) || eventNameWithDate.getDate().before(existingEventWithSameName.get().getDate())) {
+                                existingEventWithSameName.get().setDate(eventNameWithDate.getDate());
+                            }
+                            return v;
+                        });
+                   });
+
 
        });
        return result;
