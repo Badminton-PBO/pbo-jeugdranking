@@ -21,6 +21,14 @@ public class EventNameWithDate {
         return date != null && getDate().after(plannedDateCutOff);
     }
 
+    public EventNameWithDate from(EventNameWithDate another) {
+        this.setMatch(another.getMatch());
+        this.setDate(another.getDate());
+        this.setEventName(another.getEventName());
+
+        return this;
+    }
+
     public String teamVsTeamVisual() {
         return match.getTeam1().toStringVisual() + " vs " + match.getTeam2().toStringVisual();
     }

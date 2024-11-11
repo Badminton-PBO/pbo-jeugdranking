@@ -99,7 +99,7 @@ public class TpRepositoryCardImpl extends TpRepositoryImpl {
                             if (!existingEventWithSameName.isPresent()) {
                                 v.add(eventNameWithDate);
                             } else if ((eventNameWithDate.isPlanned() && !existingEventWithSameName.get().isPlanned()) || eventNameWithDate.getDate().before(existingEventWithSameName.get().getDate())) {
-                                existingEventWithSameName.get().setDate(eventNameWithDate.getDate());
+                                existingEventWithSameName.get().from(eventNameWithDate);
                             }
                             return v;
                         });
