@@ -107,6 +107,21 @@ public class TpRepositoryCardImpl extends TpRepositoryImpl {
 
 
        });
+
+       result.forEach((k,v) -> {
+              Collections.sort(v, (o1, o2) -> {
+                  if (o1.isPlanned() && o2.isPlanned()) {
+                      return o1.getDate().compareTo(o2.getDate());
+                  } else if (o1.isPlanned()) {
+                        return -1;
+                  } else if (o2.isPlanned()) {
+                      return 1;
+                  } else {
+                      return o1.getEventName().compareTo(o2.getEventName());
+                  }
+              });
+         });
+
        return result;
     }
 
